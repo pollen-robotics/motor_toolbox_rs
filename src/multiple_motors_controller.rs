@@ -1,4 +1,4 @@
-use crate::{coherency::CoherentResult, motor_controller::Result, MotorController};
+use crate::{coherency::CoherentResult, motor_controller::Result, MotorController, PID};
 
 pub trait MultipleMotorsController<const N: usize> {
     /// Check if the motor is ON or OFF
@@ -45,9 +45,9 @@ pub trait MultipleMotorsController<const N: usize> {
     fn set_torque_limit(&mut self, torque: [f64; N]) -> Result<()>;
 
     /// Get the current PID gains of the motor
-    fn get_pid_gains(&mut self) -> Result<[(f64, f64, f64); N]>;
+    fn get_pid_gains(&mut self) -> Result<[PID; N]>;
     /// Set the current PID gains of the motor
-    fn set_pid_gains(&mut self, pid_gains: [(f64, f64, f64); N]) -> Result<()>;
+    fn set_pid_gains(&mut self, pid: [PID; N]) -> Result<()>;
 }
 
 pub struct MultipleMotorsControllerWrapper<const N: usize> {
@@ -165,7 +165,7 @@ impl<const N: usize> MultipleMotorsController<N> for MultipleMotorsControllerWra
         Ok(())
     }
 
-    fn get_pid_gains(&mut self) -> Result<[(f64, f64, f64); N]> {
+    fn get_pid_gains(&mut self) -> Result<[PID; N]> {
         let mut pid_gains = vec![];
         for c in self.controllers.iter_mut() {
             match c.get_pid_gains() {
@@ -177,8 +177,8 @@ impl<const N: usize> MultipleMotorsController<N> for MultipleMotorsControllerWra
         Ok(pid_gains.try_into().unwrap())
     }
 
-    fn set_pid_gains(&mut self, pid_gains: [(f64, f64, f64); N]) -> Result<()> {
-        for (c, p) in self.controllers.iter_mut().zip(pid_gains.iter()) {
+    fn set_pid_gains(&mut self, pid: [PID; N]) -> Result<()> {
+        for (c, p) in self.controllers.iter_mut().zip(pid.iter()) {
             c.set_pid_gains(*p)?;
         }
         Ok(())
