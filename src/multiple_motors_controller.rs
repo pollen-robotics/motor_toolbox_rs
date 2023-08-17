@@ -6,7 +6,7 @@ pub trait MultipleMotorsController<const N: usize> {
     /// Enable/Disable the torque
     fn set_torque(&mut self, on: bool) -> Result<()>;
     /// Enable the torque
-    /// 
+    ///
     /// # Arguments
     /// * `reset_target` - If true, reset the target position to the current position
     fn enable_torque(&mut self, reset_target: bool) -> Result<()> {
