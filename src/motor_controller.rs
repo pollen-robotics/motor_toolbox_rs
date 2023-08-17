@@ -1,3 +1,5 @@
+use crate::PID;
+
 /// Result generic wrapper using `std::error::Error` trait
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -47,7 +49,7 @@ pub trait MotorController {
     fn set_torque_limit(&mut self, torque: f64) -> Result<()>;
 
     /// Get the current PID gains of the motor
-    fn get_pid_gains(&mut self) -> Result<(f64, f64, f64)>;
+    fn get_pid_gains(&mut self) -> Result<PID>;
     /// Set the current PID gains of the motor
-    fn set_pid_gains(&mut self, pid_gains: (f64, f64, f64)) -> Result<()>;
+    fn set_pid_gains(&mut self, pid: PID) -> Result<()>;
 }
