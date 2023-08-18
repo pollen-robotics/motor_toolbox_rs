@@ -109,3 +109,54 @@ impl MotorController for FakeMotor {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        FakeMotor, MotorController, MultipleMotorsController, MultipleMotorsControllerWrapper,
+    };
+
+    #[test]
+    fn check_default() {
+        let mut motor: FakeMotor = FakeMotor::default();
+
+        assert!(!motor.is_torque_on().unwrap());
+        assert_eq!(motor.get_current_position().unwrap(), 0.0);
+        assert_eq!(motor.get_target_position().unwrap(), 0.0);
+    }
+
+    #[test]
+    fn set_target() {
+        let mut motor: FakeMotor = FakeMotor::default();
+
+        // With torque off, the current position should not change
+        motor.set_target_position(0.5).unwrap();
+        assert_eq!(motor.get_target_position().unwrap(), 0.5);
+        assert_eq!(motor.get_current_position().unwrap(), 0.0);
+
+        // Enabling the torque, and reset the target position
+        motor.enable_torque(true).unwrap();
+        assert!(motor.is_torque_on().unwrap());
+        assert_eq!(motor.get_current_position().unwrap(), 0.0);
+        assert_eq!(motor.get_target_position().unwrap(), 0.0);
+
+        // Setting the target position
+        motor.set_target_position(0.5).unwrap();
+        assert_eq!(motor.get_target_position().unwrap(), 0.5);
+        assert_eq!(motor.get_current_position().unwrap(), 0.5);
+    }
+
+    #[test]
+    fn multiple_fake() {
+        let motor1 = Box::<FakeMotor>::default();
+        let motor2 = Box::<FakeMotor>::default();
+        let motor3 = Box::<FakeMotor>::default();
+
+        let controllers: [Box<dyn MotorController>; 3] = [motor1, motor2, motor3];
+
+        let mut wrapper = MultipleMotorsControllerWrapper::new(controllers);
+
+        wrapper.set_torque(true).unwrap();
+        assert!(wrapper.is_torque_on().unwrap());
+    }
+}
