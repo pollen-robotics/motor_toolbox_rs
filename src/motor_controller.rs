@@ -59,6 +59,16 @@ pub trait MotorController {
     fn set_pid_gains(&mut self, pid: PID) -> Result<()>;
 }
 
+#[derive(Debug)]
+pub struct MissingResisterErrror(pub String);
+impl std::fmt::Display for MissingResisterErrror {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let name = &self.0;
+        write!(f, "(missing register \"{name}\")",)
+    }
+}
+impl std::error::Error for MissingResisterErrror {}
+
 impl std::fmt::Debug for dyn MotorController {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MotorController")

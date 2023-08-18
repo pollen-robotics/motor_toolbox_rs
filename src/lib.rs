@@ -7,7 +7,7 @@ mod limit;
 pub use limit::Limit;
 
 mod motor_controller;
-pub use motor_controller::{MotorController, Result};
+pub use motor_controller::{MissingResisterErrror, MotorController, Result};
 
 mod multiple_motors_controller;
 pub use multiple_motors_controller::{MultipleMotorsController, MultipleMotorsControllerWrapper};
