@@ -17,11 +17,13 @@ pub trait MotorController {
     /// # Arguments
     /// * `reset_target` - If true, reset the target position to the current position
     fn enable_torque(&mut self, reset_target: bool) -> Result<()> {
-        self.set_torque(true)?;
         if reset_target {
             let position = self.get_current_position()?;
             self.set_target_position(position)?;
         }
+
+        self.set_torque(true)?;
+
         Ok(())
     }
     /// Disable the torque
