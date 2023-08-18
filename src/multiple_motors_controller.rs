@@ -1,6 +1,9 @@
 use crate::{coherency::CoherentResult, motor_controller::Result, MotorController, PID};
 
 pub trait MultipleMotorsController<const N: usize> {
+    /// Name of the controller (used for Debug trait)
+    fn name(&self) -> &'static str;
+
     /// Check if the motor is ON or OFF
     fn is_torque_on(&self) -> Result<bool>;
     /// Enable/Disable the torque
@@ -50,6 +53,14 @@ pub trait MultipleMotorsController<const N: usize> {
     fn set_pid_gains(&mut self, pid: [PID; N]) -> Result<()>;
 }
 
+impl<const N: usize> std::fmt::Debug for dyn MultipleMotorsController<N> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MultipleMotorsController")
+            .field("name", &self.name())
+            .finish()
+    }
+}
+
 #[derive(Debug)]
 pub struct MultipleMotorsControllerWrapper<const N: usize> {
     controllers: [Box<dyn MotorController>; N],
@@ -62,6 +73,10 @@ impl<const N: usize> MultipleMotorsControllerWrapper<N> {
 }
 
 impl<const N: usize> MultipleMotorsController<N> for MultipleMotorsControllerWrapper<N> {
+    fn name(&self) -> &'static str {
+        "MultipleMotorsController"
+    }
+
     fn is_torque_on(&self) -> Result<bool> {
         self.controllers.iter().map(|c| c.is_torque_on()).coherent()
     }
