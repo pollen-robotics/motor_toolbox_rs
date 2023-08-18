@@ -5,6 +5,9 @@ pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 /// Low level motor controller interface
 pub trait MotorController {
+    /// Name of the controller (used for Debug trait)
+    fn name(&self) -> &'static str;
+
     /// Check if the motor is ON or OFF
     fn is_torque_on(&self) -> Result<bool>;
     /// Enable/Disable the torque
@@ -52,4 +55,12 @@ pub trait MotorController {
     fn get_pid_gains(&mut self) -> Result<PID>;
     /// Set the current PID gains of the motor
     fn set_pid_gains(&mut self, pid: PID) -> Result<()>;
+}
+
+impl std::fmt::Debug for dyn MotorController {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MotorController")
+            .field("name", &self.name())
+            .finish()
+    }
 }

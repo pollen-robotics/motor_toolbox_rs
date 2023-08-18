@@ -40,6 +40,10 @@ impl Default for FakeMotor {
 }
 
 impl MotorController for FakeMotor {
+    fn name(&self) -> &'static str {
+        "FakeMotor"
+    }
+
     fn is_torque_on(&self) -> Result<bool> {
         Ok(self.torque_on)
     }

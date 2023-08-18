@@ -50,6 +50,7 @@ pub trait MultipleMotorsController<const N: usize> {
     fn set_pid_gains(&mut self, pid: [PID; N]) -> Result<()>;
 }
 
+#[derive(Debug)]
 pub struct MultipleMotorsControllerWrapper<const N: usize> {
     controllers: [Box<dyn MotorController>; N],
 }
