@@ -6,10 +6,10 @@ pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// Low level motor controller interface
 pub trait MotorController {
     /// Name of the controller (used for Debug trait)
-    fn name(&self) -> &'static str;
+    fn name(&self) -> String;
 
     /// Check if the motor is ON or OFF
-    fn is_torque_on(&self) -> Result<bool>;
+    fn is_torque_on(&mut self) -> Result<bool>;
     /// Enable/Disable the torque
     fn set_torque(&mut self, on: bool) -> Result<()>;
     /// Enable the torque

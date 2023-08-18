@@ -5,7 +5,7 @@ pub trait CoherentResult<T> {
 }
 
 #[derive(Debug)]
-struct IncoherentError;
+pub struct IncoherentError;
 impl std::fmt::Display for IncoherentError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "(incoherent values)",)

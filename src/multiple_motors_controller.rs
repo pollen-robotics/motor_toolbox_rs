@@ -1,11 +1,12 @@
-use crate::{coherency::CoherentResult, motor_controller::Result, MotorController, PID};
+use crate::coherency::IncoherentError;
+use crate::{motor_controller::Result, MotorController, PID};
 
 pub trait MultipleMotorsController<const N: usize> {
     /// Name of the controller (used for Debug trait)
-    fn name(&self) -> &'static str;
+    fn name(&self) -> String;
 
     /// Check if the motor is ON or OFF
-    fn is_torque_on(&self) -> Result<bool>;
+    fn is_torque_on(&mut self) -> Result<bool>;
     /// Enable/Disable the torque
     fn set_torque(&mut self, on: bool) -> Result<()>;
     /// Enable the torque
@@ -13,11 +14,13 @@ pub trait MultipleMotorsController<const N: usize> {
     /// # Arguments
     /// * `reset_target` - If true, reset the target position to the current position
     fn enable_torque(&mut self, reset_target: bool) -> Result<()> {
-        self.set_torque(true)?;
         if reset_target {
             let position = self.get_current_position()?;
             self.set_target_position(position)?;
         }
+
+        self.set_torque(true)?;
+
         Ok(())
     }
     /// Disable the torque
@@ -73,12 +76,26 @@ impl<const N: usize> MultipleMotorsControllerWrapper<N> {
 }
 
 impl<const N: usize> MultipleMotorsController<N> for MultipleMotorsControllerWrapper<N> {
-    fn name(&self) -> &'static str {
-        "MultipleMotorsController"
+    fn name(&self) -> String {
+        "MultipleMotorsController".to_string()
     }
 
-    fn is_torque_on(&self) -> Result<bool> {
-        self.controllers.iter().map(|c| c.is_torque_on()).coherent()
+    fn is_torque_on(&mut self) -> Result<bool> {
+        let mut torques = vec![];
+        for c in self.controllers.iter_mut() {
+            match c.is_torque_on() {
+                Ok(p) => torques.push(p),
+                Err(e) => return Err(e),
+            }
+        }
+
+        let torques: [bool; 3] = torques.try_into().unwrap();
+
+        if torques[0] == torques[1] && torques[1] == torques[2] {
+            Ok(torques[0])
+        } else {
+            Err(Box::new(IncoherentError {}))
+        }
     }
 
     fn set_torque(&mut self, on: bool) -> Result<()> {
