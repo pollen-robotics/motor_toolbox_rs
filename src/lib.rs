@@ -1,5 +1,7 @@
 mod coherency;
 
+mod fake_motor;
+
 mod limit;
 pub use limit::Limit;
 
