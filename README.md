@@ -2,8 +2,8 @@
 
 [![Build Status]][actions] [![Latest Version]][crates.io]
 
-[Build Status]: https://img.shields.io/github/actions/workflow/status/pollen-robotics/motor_toolbox_rs/rust.yml?branch=master
-[actions]: https://github.com/pollen-robotics/motor_toolbox_rs/actions?query=branch%3Amaster
+[Build Status]: https://img.shields.io/github/actions/workflow/status/pollen-robotics/motor_toolbox_rs/rust.yml?branch=main
+[actions]: https://github.com/pollen-robotics/motor_toolbox_rs/actions?query=branch%3Amain
 
 [Latest Version]: https://img.shields.io/crates/v/motor_toolbox_rs.svg
 [crates.io]: https://crates.io/crates/motor_toolbox_rs
