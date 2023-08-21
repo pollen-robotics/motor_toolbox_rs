@@ -1,16 +1,15 @@
-mod coherency;
-
 mod fake_motor;
-pub use fake_motor::FakeMotor;
+pub use fake_motor::FakeMotorsController;
 
 mod limit;
 pub use limit::Limit;
 
-mod motor_controller;
-pub use motor_controller::{MissingResisterErrror, MotorController, Result};
-
-mod multiple_motors_controller;
-pub use multiple_motors_controller::{MultipleMotorsController, MultipleMotorsControllerWrapper};
+mod motors_io;
+pub use motors_io::RawMotorsIO;
+mod motors_controller;
+pub use motors_controller::{MissingResisterErrror, MotorsController};
 
 mod pid;
 pub use pid::PID;
+
+pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;

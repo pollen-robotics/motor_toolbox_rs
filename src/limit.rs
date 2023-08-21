@@ -1,23 +1,17 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 /// Limit wrapper
-pub struct Limit<T>
-where
-    T: Copy + Ord,
-{
+pub struct Limit {
     /// lower limit
-    pub min: T,
+    pub min: f64,
     /// upper limit
-    pub max: T,
+    pub max: f64,
 }
 
-impl<T> Limit<T>
-where
-    T: Copy + Ord,
-{
+impl Limit {
     /// Clamp value to limits
-    pub fn clamp(&self, value: T) -> T {
+    pub fn clamp(&self, value: f64) -> f64 {
         value.clamp(self.min, self.max)
     }
 }
