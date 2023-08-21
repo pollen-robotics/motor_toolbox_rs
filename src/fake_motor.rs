@@ -4,6 +4,9 @@ use crate::{MotorController, Result, PID};
 
 /// Fake motor implementation for testing purposes.
 pub struct FakeMotor {
+    offset: f64,
+    reduction_ratio: f64,
+
     torque_on: bool,
 
     current_position: f64,
@@ -20,6 +23,9 @@ pub struct FakeMotor {
 impl Default for FakeMotor {
     fn default() -> Self {
         Self {
+            offset: 0.0,
+            reduction_ratio: 1.0,
+
             torque_on: false,
 
             current_position: 0.0,
@@ -44,6 +50,14 @@ impl MotorController for FakeMotor {
         "FakeMotor".to_string()
     }
 
+    fn get_offset(&mut self) -> f64 {
+        self.offset
+    }
+
+    fn get_reduction_ratio(&mut self) -> f64 {
+        self.reduction_ratio
+    }
+
     fn is_torque_on(&mut self) -> Result<bool> {
         Ok(self.torque_on)
     }
@@ -56,23 +70,22 @@ impl MotorController for FakeMotor {
         Ok(())
     }
 
-    fn get_current_position(&mut self) -> Result<f64> {
+    fn get_raw_position(&mut self) -> Result<f64> {
         Ok(self.current_position)
     }
 
-    fn get_current_velocity(&mut self) -> Result<f64> {
+    fn get_raw_velocity(&mut self) -> Result<f64> {
         Ok(self.current_velocity)
     }
 
-    fn get_current_torque(&mut self) -> Result<f64> {
+    fn get_raw_torque(&mut self) -> Result<f64> {
         Ok(self.current_torque)
     }
 
-    fn get_target_position(&mut self) -> Result<f64> {
+    fn get_raw_target_position(&mut self) -> Result<f64> {
         Ok(self.target_position)
     }
-
-    fn set_target_position(&mut self, position: f64) -> Result<()> {
+    fn set_raw_target_position(&mut self, position: f64) -> Result<()> {
         self.target_position = position;
 
         if self.torque_on {
@@ -82,20 +95,20 @@ impl MotorController for FakeMotor {
         Ok(())
     }
 
-    fn get_velocity_limit(&mut self) -> Result<f64> {
+    fn get_raw_velocity_limit(&mut self) -> Result<f64> {
         Ok(self.velocity_limit)
     }
 
-    fn set_velocity_limit(&mut self, velocity: f64) -> Result<()> {
+    fn set_raw_velocity_limit(&mut self, velocity: f64) -> Result<()> {
         self.velocity_limit = velocity;
         Ok(())
     }
 
-    fn get_torque_limit(&mut self) -> Result<f64> {
+    fn get_raw_torque_limit(&mut self) -> Result<f64> {
         Ok(self.torque_limit)
     }
 
-    fn set_torque_limit(&mut self, torque: f64) -> Result<()> {
+    fn set_raw_torque_limit(&mut self, torque: f64) -> Result<()> {
         self.torque_limit = torque;
         Ok(())
     }
