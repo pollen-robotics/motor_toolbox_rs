@@ -182,42 +182,44 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{fake_motor::FakeMotorsIO, motors_io::RawMotorsIO};
+    mod io {
+        use crate::{fake_motor::FakeMotorsIO, motors_io::RawMotorsIO};
 
-    #[test]
-    fn check_default() {
-        let mut motor = FakeMotorsIO::<1>::default();
+        #[test]
+        fn check_default() {
+            let mut motor = FakeMotorsIO::<1>::default();
 
-        assert!(!motor.is_torque_on().unwrap()[0]);
-        assert_eq!(motor.get_current_position().unwrap(), [0.0]);
-        assert_eq!(motor.get_target_position().unwrap(), [0.0]);
-    }
+            assert!(!motor.is_torque_on().unwrap()[0]);
+            assert_eq!(motor.get_current_position().unwrap(), [0.0]);
+            assert_eq!(motor.get_target_position().unwrap(), [0.0]);
+        }
 
-    #[test]
-    fn set_target() {
-        let mut motor = FakeMotorsIO::<1>::default();
+        #[test]
+        fn set_target() {
+            let mut motor = FakeMotorsIO::<1>::default();
 
-        // With torque off, the current position should not change
-        motor.set_target_position([0.5]).unwrap();
-        assert_eq!(motor.get_target_position().unwrap(), [0.5]);
-        assert_eq!(motor.get_current_position().unwrap(), [0.0]);
+            // With torque off, the current position should not change
+            motor.set_target_position([0.5]).unwrap();
+            assert_eq!(motor.get_target_position().unwrap(), [0.5]);
+            assert_eq!(motor.get_current_position().unwrap(), [0.0]);
 
-        // Enabling the torque
-        motor.set_torque([true]).unwrap();
-        assert!(motor.is_torque_on().unwrap()[0]);
-        assert_eq!(motor.get_current_position().unwrap(), [0.5]);
-        assert_eq!(motor.get_target_position().unwrap(), [0.5]);
+            // Enabling the torque
+            motor.set_torque([true]).unwrap();
+            assert!(motor.is_torque_on().unwrap()[0]);
+            assert_eq!(motor.get_current_position().unwrap(), [0.5]);
+            assert_eq!(motor.get_target_position().unwrap(), [0.5]);
 
-        // Setting the target position
-        motor.set_target_position([0.25]).unwrap();
-        assert_eq!(motor.get_target_position().unwrap(), [0.25]);
-        assert_eq!(motor.get_current_position().unwrap(), [0.25]);
-    }
+            // Setting the target position
+            motor.set_target_position([0.25]).unwrap();
+            assert_eq!(motor.get_target_position().unwrap(), [0.25]);
+            assert_eq!(motor.get_current_position().unwrap(), [0.25]);
+        }
 
-    #[test]
-    fn multiple_fake() {
-        let mut motors = FakeMotorsIO::<3>::default();
-        motors.set_torque([true, false, true]).unwrap();
-        assert_eq!(motors.is_torque_on().unwrap(), [true, false, true]);
+        #[test]
+        fn multiple_fake() {
+            let mut motors = FakeMotorsIO::<3>::default();
+            motors.set_torque([true, false, true]).unwrap();
+            assert_eq!(motors.is_torque_on().unwrap(), [true, false, true]);
+        }
     }
 }
