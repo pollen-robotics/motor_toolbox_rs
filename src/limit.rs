@@ -34,9 +34,15 @@ impl Limit {
     }
 }
 
-impl From<(f64, f64)> for Limit {
-    fn from((min, max): (f64, f64)) -> Self {
-        Self::new(min, max)
+impl TryFrom<(f64, f64)> for Limit {
+    type Error = &'static str;
+
+    fn try_from(value: (f64, f64)) -> Result<Self, Self::Error> {
+        if value.0 > value.1 {
+            Err("min must be less than max")
+        } else {
+            Ok(Self::new(value.0, value.1))
+        }
     }
 }
 
@@ -73,13 +79,13 @@ mod tests {
 
     #[test]
     fn test_into() {
-        let limit: Limit = (0.0, 1.0).into();
+        let limit: Limit = (0.0, 1.0).try_into().unwrap();
         assert_eq!(limit, Limit::new(0.0, 1.0));
     }
 
     #[test]
-    #[should_panic]
     fn test_into_bad() {
-        let _: Limit = (1.0, 0.0).into();
+        let limit: Result<Limit, _> = (1.0, 0.0).try_into();
+        assert!(limit.is_err());
     }
 }
