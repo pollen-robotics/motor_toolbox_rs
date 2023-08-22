@@ -34,6 +34,12 @@ impl Limit {
     }
 }
 
+impl From<(f64, f64)> for Limit {
+    fn from((min, max): (f64, f64)) -> Self {
+        Self::new(min, max)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::Limit;
@@ -63,5 +69,17 @@ mod tests {
         assert_eq!(limit1, limit2);
         assert_ne!(limit1, limit3);
         assert_ne!(limit1, limit4);
+    }
+
+    #[test]
+    fn test_into() {
+        let limit: Limit = (0.0, 1.0).into();
+        assert_eq!(limit, Limit::new(0.0, 1.0));
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_into_bad() {
+        let _: Limit = (1.0, 0.0).into();
     }
 }
