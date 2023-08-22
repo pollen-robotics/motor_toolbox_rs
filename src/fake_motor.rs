@@ -182,6 +182,51 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
 
 #[cfg(test)]
 mod tests {
+    mod controller {
+        use crate::fake_motor::FakeMotorsController;
+        use crate::motors_controller::MotorsController;
+
+        #[test]
+        fn check_default() {
+            let motor = FakeMotorsController::<1>::default();
+
+            assert_eq!(motor.offsets(), [None]);
+            assert_eq!(motor.reduction(), [None]);
+            assert_eq!(motor.limits(), [None]);
+        }
+
+        #[test]
+        fn check_with() {
+            let motor = FakeMotorsController::<1>::new();
+
+            assert_eq!(motor.offsets(), [None]);
+            assert_eq!(motor.reduction(), [None]);
+            assert_eq!(motor.limits(), [None]);
+
+            let motor = motor.with_offsets([Some(1.0)]);
+            assert_eq!(motor.offsets(), [Some(1.0)]);
+            assert_eq!(motor.reduction(), [None]);
+            assert_eq!(motor.limits(), [None]);
+
+            let motor = motor.with_reduction([Some(2.0)]);
+            assert_eq!(motor.offsets(), [Some(1.0)]);
+            assert_eq!(motor.reduction(), [Some(2.0)]);
+            assert_eq!(motor.limits(), [None]);
+
+            let motor = motor.with_limits([Some((0.0, 1.0).try_into().unwrap())]);
+            assert_eq!(motor.offsets(), [Some(1.0)]);
+            assert_eq!(motor.reduction(), [Some(2.0)]);
+            assert_eq!(motor.limits(), [Some((0.0, 1.0).try_into().unwrap())]);
+
+            let motor = FakeMotorsController::<1>::new()
+                .with_offsets([Some(1.0)])
+                .with_limits([Some((0.0, 1.0).try_into().unwrap())]);
+            assert_eq!(motor.offsets(), [Some(1.0)]);
+            assert_eq!(motor.reduction(), [None]);
+            assert_eq!(motor.limits(), [Some((0.0, 1.0).try_into().unwrap())]);
+        }
+    }
+
     mod io {
         use crate::{fake_motor::FakeMotorsIO, motors_io::RawMotorsIO};
 
