@@ -22,6 +22,8 @@ pub trait MotorsController<const N: usize> {
     /// Get the current position of the motors (in radians)
     fn get_current_position(&mut self) -> Result<[f64; N]> {
         let mut position = self.io().get_current_position()?;
+        log::debug!(target: "controller::get_current_position", "raw current_position: {:?}", position);
+
         let reductions = self.reduction();
         let offsets = self.offsets();
 
@@ -33,11 +35,15 @@ pub trait MotorsController<const N: usize> {
                 position[i] -= offsets;
             }
         }
+        log::debug!(target: "controller::get_current_position", "after offset/reduction current_position: {:?}", position);
+
         Ok(position)
     }
     /// Get the current velocity of the motors (in radians per second)
     fn get_current_velocity(&mut self) -> Result<[f64; N]> {
         let mut velocity = self.io().get_current_velocity()?;
+        log::debug!(target: "controller::get_current_velocity", "raw current_velocity: {:?}", velocity);
+
         let reductions = self.reduction();
 
         for i in 0..N {
@@ -45,11 +51,15 @@ pub trait MotorsController<const N: usize> {
                 velocity[i] /= reductions;
             }
         }
+        log::debug!(target: "controller::get_current_velocity", "after reduction current_velocity: {:?}", velocity);
+
         Ok(velocity)
     }
     /// Get the current torque of the motors (in Nm)
     fn get_current_torque(&mut self) -> Result<[f64; N]> {
         let mut torque = self.io().get_current_torque()?;
+        log::debug!(target: "controller::get_current_torque", "raw current_torque: {:?}", torque);
+
         let reductions = self.reduction();
 
         for i in 0..N {
@@ -57,11 +67,15 @@ pub trait MotorsController<const N: usize> {
                 torque[i] /= reductions;
             }
         }
+        log::debug!(target: "controller::get_current_torque", "after reduction current_torque: {:?}", torque);
+
         Ok(torque)
     }
     /// Get the current target position of the motors (in radians)
     fn get_target_position(&mut self) -> Result<[f64; N]> {
         let mut position = self.io().get_target_position()?;
+        log::debug!(target: "controller::get_target_position", "raw target_position: {:?}", position);
+
         let reductions = self.reduction();
         let offsets = self.offsets();
 
@@ -73,10 +87,14 @@ pub trait MotorsController<const N: usize> {
                 position[i] -= offsets;
             }
         }
+        log::debug!(target: "controller::get_target_position", "after offset/reduction target_position: {:?}", position);
+
         Ok(position)
     }
     /// Set the current target position of the motors (in radians)
     fn set_target_position(&mut self, position: [f64; N]) -> Result<()> {
+        log::debug!(target: "controller::set_target_position", "real target_position: {:?}", position);
+
         let mut limited_position = position;
         for i in 0..N {
             if let Some(limits) = self.limits()[i] {
@@ -95,12 +113,17 @@ pub trait MotorsController<const N: usize> {
                 limited_position[i] *= reductions;
             }
         }
+
+        log::debug!(target: "controller::set_target_position", "raw target_position: {:?}", limited_position);
+
         self.io().set_target_position(limited_position)
     }
 
     /// Get the velocity limit of the motors (in radians per second)
     fn get_velocity_limit(&mut self) -> Result<[f64; N]> {
         let mut velocity = self.io().get_velocity_limit()?;
+        log::debug!(target: "controller::get_velocity_limit", "raw velocity_limit: {:?}", velocity);
+
         let reductions = self.reduction();
 
         for i in 0..N {
@@ -108,10 +131,14 @@ pub trait MotorsController<const N: usize> {
                 velocity[i] /= reductions;
             }
         }
+        log::debug!(target: "controller::get_velocity_limit", "after reduction velocity_limit: {:?}", velocity);
+
         Ok(velocity)
     }
     /// Set the velocity limit of the motors (in radians per second)
     fn set_velocity_limit(&mut self, velocity: [f64; N]) -> Result<()> {
+        log::debug!(target: "controller::set_velocity_limit", "real velocity_limit: {:?}", velocity);
+
         let reductions = self.reduction();
         let mut velocity = velocity;
 
@@ -120,11 +147,15 @@ pub trait MotorsController<const N: usize> {
                 velocity[i] *= reductions;
             }
         }
+        log::debug!(target: "controller::set_velocity_limit", "raw velocity_limit: {:?}", velocity);
+
         self.io().set_velocity_limit(velocity)
     }
     /// Get the torque limit of the motors (in Nm)
     fn get_torque_limit(&mut self) -> Result<[f64; N]> {
         let mut torque = self.io().get_torque_limit()?;
+        log::debug!(target: "controller::get_torque_limit", "raw torque_limit: {:?}", torque);
+
         let reductions = self.reduction();
 
         for i in 0..N {
@@ -132,10 +163,14 @@ pub trait MotorsController<const N: usize> {
                 torque[i] /= reductions;
             }
         }
+        log::debug!(target: "controller::get_torque_limit", "after reduction torque_limit: {:?}", torque);
+
         Ok(torque)
     }
     /// Set the torque limit of the motors (in Nm)
     fn set_torque_limit(&mut self, torque: [f64; N]) -> Result<()> {
+        log::debug!(target: "controller::set_torque_limit", "real torque_limit: {:?}", torque);
+
         let reductions = self.reduction();
         let mut torque = torque;
 
@@ -144,6 +179,8 @@ pub trait MotorsController<const N: usize> {
                 torque[i] *= reductions;
             }
         }
+        log::debug!(target: "controller::set_torque_limit", "raw torque_limit: {:?}", torque);
+
         self.io().set_torque_limit(torque)
     }
     /// Get the current PID gains of the motors

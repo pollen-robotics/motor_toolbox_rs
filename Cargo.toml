@@ -1,6 +1,6 @@
 [package]
 name = "motor_toolbox_rs"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 license = "Apache-2.0"
 authors = ["Pollen Robotics"]
@@ -15,4 +15,8 @@ categories = ["science::robotics"]
 
 [dependencies]
 itertools = "0.11.0"
+log = "0.4.20"
 serde = { version = "1.0.183", features = ["derive"] }
+
+[dev-dependencies]
+env_logger = "0.10.0"
