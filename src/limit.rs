@@ -52,4 +52,16 @@ mod tests {
         assert_eq!(limit.clamp(0.0), 0.0);
         assert_eq!(limit.clamp(2.0), 1.0);
     }
+
+    #[test]
+    fn test_eq() {
+        let limit1 = Limit::new(-1.0, 1.0);
+        let limit2 = Limit::new(-1.0, 1.0);
+        let limit3 = Limit::new(-1.0, 2.0);
+        let limit4 = Limit::new(0.0, 1.0);
+
+        assert_eq!(limit1, limit2);
+        assert_ne!(limit1, limit3);
+        assert_ne!(limit1, limit4);
+    }
 }
