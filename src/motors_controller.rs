@@ -22,6 +22,8 @@ pub trait MotorsController<const N: usize> {
     /// Get the current position of the motors (in radians)
     fn get_current_position(&mut self) -> Result<[f64; N]> {
         let mut position = self.io().get_current_position()?;
+        log::debug!(target: "controller::get_current_position", "raw current_position: {:?}", position);
+
         let reductions = self.reduction();
         let offsets = self.offsets();
 
@@ -33,6 +35,8 @@ pub trait MotorsController<const N: usize> {
                 position[i] -= offsets;
             }
         }
+        log::debug!(target: "controller::get_current_position", "after offset/reduction current_position: {:?}", position);
+
         Ok(position)
     }
     /// Get the current velocity of the motors (in radians per second)
@@ -77,6 +81,8 @@ pub trait MotorsController<const N: usize> {
     }
     /// Set the current target position of the motors (in radians)
     fn set_target_position(&mut self, position: [f64; N]) -> Result<()> {
+        log::debug!(target: "controller::set_target_position", "real target_position: {:?}", position);
+
         let mut limited_position = position;
         for i in 0..N {
             if let Some(limits) = self.limits()[i] {
@@ -95,6 +101,9 @@ pub trait MotorsController<const N: usize> {
                 limited_position[i] *= reductions;
             }
         }
+
+        log::debug!(target: "controller::set_target_position", "raw target_position: {:?}", limited_position);
+
         self.io().set_target_position(limited_position)
     }
 

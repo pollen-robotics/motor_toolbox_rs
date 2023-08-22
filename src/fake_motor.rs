@@ -108,6 +108,8 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
     }
 
     fn set_torque(&mut self, on: [bool; N]) -> Result<()> {
+        log::info!(target: "fake_io", "Setting torque to {:?}", on);
+
         for (cur, target, on, torque_on) in izip!(
             &mut self.current_position,
             self.target_position,
@@ -183,8 +185,11 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
 #[cfg(test)]
 mod tests {
     mod controller {
+        use std::f64::consts::PI;
+
         use crate::fake_motor::FakeMotorsController;
         use crate::motors_controller::MotorsController;
+        use crate::PID;
 
         #[test]
         fn check_default() {
@@ -224,6 +229,207 @@ mod tests {
             assert_eq!(motor.offsets(), [Some(1.0)]);
             assert_eq!(motor.reduction(), [None]);
             assert_eq!(motor.limits(), [Some((0.0, 1.0).try_into().unwrap())]);
+        }
+
+        #[test]
+        fn check_torque() {
+            let mut motor = FakeMotorsController::<3>::default();
+
+            let torques = motor.is_torque_on().unwrap();
+            assert!(torques.iter().all(|&x| !x));
+
+            motor.set_torque([true, false, true]).unwrap();
+            let torques = motor.is_torque_on().unwrap();
+            assert!(torques[0]);
+            assert!(!torques[1]);
+            assert!(torques[2]);
+
+            motor.set_torque([false, true, false]).unwrap();
+            let torques = motor.is_torque_on().unwrap();
+            assert!(!torques[0]);
+            assert!(torques[1]);
+            assert!(!torques[2]);
+        }
+
+        #[test]
+        fn offset() {
+            let mut motor =
+                FakeMotorsController::<3>::new().with_offsets([Some(-1.0), Some(1.0), None]);
+
+            motor.set_torque([true; 3]).unwrap();
+            assert_eq!(motor.get_current_position().unwrap(), [1.0, -1.0, 0.0]);
+
+            motor.set_target_position([0.0, 0.0, 0.0]).unwrap();
+            assert_eq!(motor.get_target_position().unwrap(), [0.0, 0.0, 0.0]);
+            assert_eq!(motor.get_current_position().unwrap(), [0.0, 0.0, 0.0]);
+
+            let raw_current = motor.io().get_current_position().unwrap();
+            assert_eq!(raw_current, [-1.0, 1.0, 0.0]);
+            let raw_target = motor.io().get_target_position().unwrap();
+            assert_eq!(raw_target, [-1.0, 1.0, 0.0]);
+        }
+
+        #[test]
+        fn reduction() {
+            let mut motor =
+                FakeMotorsController::<3>::new().with_reduction([Some(-2.0), None, Some(1.0)]);
+
+            motor.set_torque([true; 3]).unwrap();
+            assert_eq!(motor.get_current_position().unwrap(), [0.0, 0.0, 0.0]);
+
+            motor.set_target_position([1.0, 1.0, 1.0]).unwrap();
+            assert_eq!(motor.get_target_position().unwrap(), [1.0, 1.0, 1.0]);
+            assert_eq!(motor.get_current_position().unwrap(), [1.0, 1.0, 1.0]);
+
+            let raw_current = motor.io().get_current_position().unwrap();
+            assert_eq!(raw_current, [-2.0, 1.0, 1.0]);
+            let raw_target = motor.io().get_target_position().unwrap();
+            assert_eq!(raw_target, [-2.0, 1.0, 1.0]);
+        }
+
+        #[test]
+        fn limit() {
+            let mut motor = FakeMotorsController::<3>::new().with_limits([
+                Some((0.0, 1.0).try_into().unwrap()),
+                Some((-1.0, 1.0).try_into().unwrap()),
+                None,
+            ]);
+
+            motor.set_torque([true; 3]).unwrap();
+            assert_eq!(motor.get_current_position().unwrap(), [0.0, 0.0, 0.0]);
+
+            motor.set_target_position([-0.5, -0.5, -0.5]).unwrap();
+            assert_eq!(motor.get_target_position().unwrap(), [0.0, -0.5, -0.5]);
+            assert_eq!(motor.get_current_position().unwrap(), [0.0, -0.5, -0.5]);
+
+            let raw_current = motor.io().get_current_position().unwrap();
+            assert_eq!(raw_current, [0.0, -0.5, -0.5]);
+            let raw_target = motor.io().get_target_position().unwrap();
+            assert_eq!(raw_target, [0.0, -0.5, -0.5]);
+
+            motor.set_target_position([PI, PI, PI]).unwrap();
+            assert_eq!(motor.get_target_position().unwrap(), [1.0, 1.0, PI]);
+            assert_eq!(motor.get_current_position().unwrap(), [1.0, 1.0, PI]);
+
+            let raw_current = motor.io().get_current_position().unwrap();
+            assert_eq!(raw_current, [1.0, 1.0, PI]);
+            let raw_target = motor.io().get_target_position().unwrap();
+            assert_eq!(raw_target, [1.0, 1.0, PI]);
+        }
+
+        #[test]
+        fn offset_reduction_limit() {
+            let mut motor = FakeMotorsController::<3>::new()
+                .with_offsets([Some(-1.0), Some(1.0), None])
+                .with_reduction([Some(2.0), None, Some(1.0)])
+                .with_limits([
+                    Some((0.0, 1.0).try_into().unwrap()),
+                    Some((-1.0, 1.0).try_into().unwrap()),
+                    None,
+                ]);
+
+            motor.set_torque([true; 3]).unwrap();
+            assert_eq!(motor.get_current_position().unwrap(), [1.0, -1.0, 0.0]);
+
+            motor.set_target_position([0.0, 0.0, 0.0]).unwrap();
+            assert_eq!(motor.get_target_position().unwrap(), [0.0, 0.0, 0.0]);
+            assert_eq!(motor.get_current_position().unwrap(), [0.0, 0.0, 0.0]);
+
+            motor.set_target_position([-0.5, -0.5, -0.5]).unwrap();
+            assert_eq!(motor.get_target_position().unwrap(), [0.0, -0.5, -0.5]);
+            assert_eq!(motor.get_current_position().unwrap(), [0.0, -0.5, -0.5]);
+
+            let raw_current = motor.io().get_current_position().unwrap();
+            assert_eq!(raw_current, [-2.0, 0.5, -0.5]);
+
+            motor.set_target_position([PI, PI, PI]).unwrap();
+            assert_eq!(motor.get_target_position().unwrap(), [1.0, 1.0, PI]);
+            assert_eq!(motor.get_current_position().unwrap(), [1.0, 1.0, PI]);
+
+            let raw_current = motor.io().get_current_position().unwrap();
+            assert_eq!(raw_current, [0.0, 2.0, PI]);
+            let raw_target = motor.io().get_target_position().unwrap();
+            assert_eq!(raw_target, [0.0, 2.0, PI]);
+        }
+
+        #[test]
+        fn target_position() {
+            let mut motors = FakeMotorsController::<3>::new()
+                .with_offsets([Some(-1.0), Some(1.0), None])
+                .with_reduction([Some(2.0), None, Some(1.0)])
+                .with_limits([
+                    Some((0.0, 1.0).try_into().unwrap()),
+                    Some((-1.0, 1.0).try_into().unwrap()),
+                    None,
+                ]);
+
+            motors.set_target_position([0.0, 1.0, 2.0]).unwrap();
+            assert_eq!(motors.get_target_position().unwrap(), [0.0, 1.0, 2.0]);
+
+            motors.set_target_position([-1.0, 0.0, 1.0]).unwrap();
+            assert_eq!(motors.get_target_position().unwrap(), [0.0, 0.0, 1.0]);
+        }
+
+        #[test]
+        fn velocity_limit() {
+            let mut motors = FakeMotorsController::<3>::new()
+                .with_offsets([Some(-1.0), Some(1.0), None])
+                .with_reduction([Some(2.0), None, Some(1.0)])
+                .with_limits([
+                    Some((0.0, 1.0).try_into().unwrap()),
+                    Some((-1.0, 1.0).try_into().unwrap()),
+                    None,
+                ]);
+
+            motors.set_velocity_limit([1.0, 2.0, 3.0]).unwrap();
+            assert_eq!(motors.get_velocity_limit().unwrap(), [1.0, 2.0, 3.0]);
+        }
+
+        #[test]
+        fn torque_limit() {
+            let mut motors = FakeMotorsController::<3>::new()
+                .with_offsets([Some(-1.0), Some(1.0), None])
+                .with_reduction([Some(2.0), None, Some(1.0)])
+                .with_limits([
+                    Some((0.0, 1.0).try_into().unwrap()),
+                    Some((-1.0, 1.0).try_into().unwrap()),
+                    None,
+                ]);
+
+            motors.set_torque_limit([1.0, 2.0, 3.0]).unwrap();
+            assert_eq!(motors.get_torque_limit().unwrap(), [1.0, 2.0, 3.0]);
+        }
+
+        #[test]
+        fn pid() {
+            let mut motors = FakeMotorsController::<3>::new()
+                .with_offsets([Some(-1.0), Some(1.0), None])
+                .with_reduction([Some(2.0), None, Some(1.0)])
+                .with_limits([
+                    Some((0.0, 1.0).try_into().unwrap()),
+                    Some((-1.0, 1.0).try_into().unwrap()),
+                    None,
+                ]);
+
+            let pids = [
+                PID {
+                    p: 1.0,
+                    i: 2.0,
+                    d: 3.0,
+                },
+                PID {
+                    p: 4.0,
+                    i: 5.0,
+                    d: 6.0,
+                },
+                PID {
+                    p: 7.0,
+                    i: 8.0,
+                    d: 9.0,
+                },
+            ];
+            motors.set_pid_gains(pids).unwrap();
+            assert_eq!(motors.get_pid_gains().unwrap(), pids);
         }
     }
 
