@@ -1,3 +1,6 @@
+#![feature(generic_const_exprs)]
+#![allow(incomplete_features)]
+
 mod fake_motor;
 pub use fake_motor::FakeMotorsController;
 

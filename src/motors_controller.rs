@@ -119,6 +119,37 @@ pub trait MotorsController<const N: usize> {
         self.io().set_target_position(limited_position)
     }
 
+    /// Set the current target position and returns the motor feeback (position, velocity, torque)
+    fn set_target_position_fb(&mut self, position: [f64; N]) -> Result<[f64; N*3]> {
+        log::debug!(target: "controller::set_target_position", "real target_position: {:?}", position);
+
+        let mut limited_position = position;
+        for i in 0..N {
+            if let Some(limits) = self.limits()[i] {
+                limited_position[i] = limits.clamp(position[i]);
+            }
+        }
+
+        let reductions = self.reduction();
+        let offsets = self.offsets();
+
+        for i in 0..N {
+            if let Some(offsets) = offsets[i] {
+                limited_position[i] += offsets;
+            }
+            if let Some(reductions) = reductions[i] {
+                limited_position[i] *= reductions;
+            }
+        }
+
+        log::debug!(target: "controller::set_target_position", "raw target_position: {:?}", limited_position);
+
+        self.io().set_target_position_fb(limited_position)
+    }
+
+
+
+
     /// Get the velocity limit of the motors (in radians per second)
     fn get_velocity_limit(&mut self) -> Result<[f64; N]> {
         let mut velocity = self.io().get_velocity_limit()?;
