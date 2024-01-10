@@ -153,7 +153,7 @@ pub trait MotorsController<const N: usize> {
             if let Some(reductions) = reductions[i] {
                 fb[i] /= reductions; //position
 		fb[i+N] /= reductions; //velocity
-		fb[i+N*2] /= reductions; //torque
+		// fb[i+N*2] /= reductions; //torque
             }
             if let Some(offsets) = offsets[i] {
                 fb[i] -= offsets;
