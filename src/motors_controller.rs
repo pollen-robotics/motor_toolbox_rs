@@ -144,7 +144,23 @@ pub trait MotorsController<const N: usize> {
 
         log::debug!(target: "controller::set_target_position", "raw target_position: {:?}", limited_position);
 
-        self.io().set_target_position_fb(limited_position)
+        let mut fb=self.io().set_target_position_fb(limited_position)?;
+	// let ret:[f64;N*3]=fb?;
+	// let ret=[0.0;N*3];
+
+
+        for i in 0..N {
+            if let Some(offsets) = offsets[i] {
+                fb[i] += offsets;
+            }
+            if let Some(reductions) = reductions[i] {
+                fb[i] *= reductions;
+            }
+        }
+
+
+	Ok(fb)
+
     }
 
 
