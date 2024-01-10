@@ -151,10 +151,10 @@ pub trait MotorsController<const N: usize> {
 
         for i in 0..N {
             if let Some(offsets) = offsets[i] {
-                fb[i] += offsets;
+                fb[i] -= offsets;
             }
             if let Some(reductions) = reductions[i] {
-                fb[i] *= reductions;
+                fb[i] /= reductions;
             }
         }
 
