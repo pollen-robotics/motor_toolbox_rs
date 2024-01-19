@@ -241,6 +241,11 @@ pub trait MotorsController<const N: usize> {
     fn set_pid_gains(&mut self, pid: [PID; N]) -> Result<()> {
         self.io().set_pid_gains(pid)
     }
+
+    fn get_axis_sensors(&mut self) -> Result<[f64; N]> {
+	self.io().get_axis_sensors()
+    }
+
 }
 
 #[derive(Debug)]
