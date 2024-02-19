@@ -120,7 +120,7 @@ pub trait MotorsController<const N: usize> {
     }
 
     /// Set the current target position and returns the motor feeback (position, velocity, torque)
-    fn set_target_position_fb(&mut self, position: [f64; N]) -> Result<[f64; N * 3]> {
+    fn set_target_position_fb(&mut self, position: [f64; N]) -> Result<[f64; N]> {
         log::debug!(target: "controller::set_target_position", "real target_position: {:?}", position);
 
         let mut limited_position = position;
@@ -151,8 +151,8 @@ pub trait MotorsController<const N: usize> {
         for i in 0..N {
             if let Some(reductions) = reductions[i] {
                 fb[i] /= reductions; //position
-                fb[i + N] /= reductions; //velocity
-                                         // fb[i+N*2] /= reductions; //torque
+                                     // fb[i + N] /= reductions; //velocity
+                                     // fb[i+N*2] /= reductions; //torque
             }
             if let Some(offsets) = offsets[i] {
                 fb[i] -= offsets;
