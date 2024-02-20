@@ -162,12 +162,10 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
         Ok(())
     }
 
-
-    fn set_target_position_fb(&mut self, target_position: [f64; N]) -> Result<[f64; N*3]> {
+    fn set_target_position_fb(&mut self, target_position: [f64; N]) -> Result<[f64; N]> {
         log::info!(target: "fake_io::set_target_position", "Setting target_position to {:?}", target_position);
         self.target_position = target_position;
-	let mut fb:[f64;N*3]=[0.0;{N*3}];
-
+        let mut fb: [f64; N] = [0.0; { N }];
 
         for (cur, on, target) in izip!(&mut self.current_position, self.torque_on, target_position)
         {
@@ -177,16 +175,13 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
             } else {
                 log::debug!(target: "fake_io::set_target_position", "Current position unchanged (torque off)");
             }
-
         }
-	fb[0..N].copy_from_slice(&self.current_position);
-	fb[N..2*N].copy_from_slice(&self.current_velocity);
-	fb[2*N..3*N].copy_from_slice(&self.current_torque);
+        fb[0..N].copy_from_slice(&self.current_position);
+        // fb[N..2*N].copy_from_slice(&self.current_velocity);
+        // fb[2*N..3*N].copy_from_slice(&self.current_torque);
 
         Ok(fb)
     }
-
-
 
     fn get_velocity_limit(&mut self) -> Result<[f64; N]> {
         Ok(self.velocity_limit)
@@ -219,9 +214,8 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
     }
 
     fn get_axis_sensors(&mut self) -> Result<[f64; N]> {
-	Ok(self.current_position)
+        Ok(self.current_position)
     }
-
 }
 
 #[cfg(test)]
