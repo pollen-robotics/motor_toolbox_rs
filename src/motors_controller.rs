@@ -164,66 +164,66 @@ pub trait MotorsController<const N: usize> {
 
     /// Get the velocity limit of the motors (in radians per second)
     fn get_velocity_limit(&mut self) -> Result<[f64; N]> {
-        let mut velocity = self.io().get_velocity_limit()?;
+        let velocity = self.io().get_velocity_limit()?;
         log::debug!(target: "controller::get_velocity_limit", "raw velocity_limit: {:?}", velocity);
+        /*
+            let reductions = self.reduction();
 
-        let reductions = self.reduction();
-
-        for i in 0..N {
-            if let Some(reductions) = reductions[i] {
-                velocity[i] /= reductions;
+            for i in 0..N {
+                if let Some(reductions) = reductions[i] {
+                    velocity[i] /= reductions;
+                }
             }
-        }
-        log::debug!(target: "controller::get_velocity_limit", "after reduction velocity_limit: {:?}", velocity);
-
+            log::debug!(target: "controller::get_velocity_limit", "after reduction velocity_limit: {:?}", velocity);
+        */
         Ok(velocity)
     }
     /// Set the velocity limit of the motors (in radians per second)
     fn set_velocity_limit(&mut self, velocity: [f64; N]) -> Result<()> {
         log::debug!(target: "controller::set_velocity_limit", "real velocity_limit: {:?}", velocity);
+        /*
+            let reductions = self.reduction();
+            let mut velocity = velocity;
 
-        let reductions = self.reduction();
-        let mut velocity = velocity;
-
-        for i in 0..N {
-            if let Some(reductions) = reductions[i] {
-                velocity[i] *= reductions;
+            for i in 0..N {
+                if let Some(reductions) = reductions[i] {
+                    velocity[i] *= reductions;
+                }
             }
-        }
-        log::debug!(target: "controller::set_velocity_limit", "raw velocity_limit: {:?}", velocity);
-
+            log::debug!(target: "controller::set_velocity_limit", "raw velocity_limit: {:?}", velocity);
+        */
         self.io().set_velocity_limit(velocity)
     }
     /// Get the torque limit of the motors (in Nm)
     fn get_torque_limit(&mut self) -> Result<[f64; N]> {
-        let mut torque = self.io().get_torque_limit()?;
+        let torque = self.io().get_torque_limit()?;
         log::debug!(target: "controller::get_torque_limit", "raw torque_limit: {:?}", torque);
+        /*
+            let reductions = self.reduction();
 
-        let reductions = self.reduction();
-
-        for i in 0..N {
-            if let Some(reductions) = reductions[i] {
-                torque[i] /= reductions;
+            for i in 0..N {
+                if let Some(reductions) = reductions[i] {
+                    torque[i] /= reductions;
+                }
             }
-        }
-        log::debug!(target: "controller::get_torque_limit", "after reduction torque_limit: {:?}", torque);
-
+            log::debug!(target: "controller::get_torque_limit", "after reduction torque_limit: {:?}", torque);
+        */
         Ok(torque)
     }
     /// Set the torque limit of the motors (in Nm)
     fn set_torque_limit(&mut self, torque: [f64; N]) -> Result<()> {
         log::debug!(target: "controller::set_torque_limit", "real torque_limit: {:?}", torque);
+        /*
+            let reductions = self.reduction();
+            let mut torque = torque;
 
-        let reductions = self.reduction();
-        let mut torque = torque;
-
-        for i in 0..N {
-            if let Some(reductions) = reductions[i] {
-                torque[i] *= reductions;
+            for i in 0..N {
+                if let Some(reductions) = reductions[i] {
+                    torque[i] *= reductions;
+                }
             }
-        }
-        log::debug!(target: "controller::set_torque_limit", "raw torque_limit: {:?}", torque);
-
+            log::debug!(target: "controller::set_torque_limit", "raw torque_limit: {:?}", torque);
+        */
         self.io().set_torque_limit(torque)
     }
     /// Get the current PID gains of the motors
