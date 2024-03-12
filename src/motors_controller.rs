@@ -235,8 +235,14 @@ pub trait MotorsController<const N: usize> {
         self.io().set_pid_gains(pid)
     }
 
+    /// Get the current axis sensors of the articulation
     fn get_axis_sensors(&mut self) -> Result<[f64; N]> {
         self.io().get_axis_sensors()
+    }
+
+    /// Get the current state of the articulation control board
+    fn get_board_state(&mut self) -> Result<u8> {
+        self.io().get_board_state()
     }
 }
 
