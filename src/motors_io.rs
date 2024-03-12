@@ -32,4 +32,10 @@ pub trait RawMotorsIO<const N: usize> {
     fn get_pid_gains(&mut self) -> Result<[PID; N]>;
     /// Set the current PID gains of the motors
     fn set_pid_gains(&mut self, pid: [PID; N]) -> Result<()>;
+
+    /// Get the current axis sensors
+    fn get_axis_sensors(&mut self) -> Result<[f64; N]>;
+
+    /// Get the Board State byte
+    fn get_board_state(&mut self) -> Result<u8>;
 }

@@ -191,6 +191,14 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
         self.pid = pid;
         Ok(())
     }
+
+    fn get_axis_sensors(&mut self) -> Result<[f64; N]> {
+        Ok(self.current_position)
+    }
+
+    fn get_board_state(&mut self) -> Result<u8> {
+        Ok(0)
+    }
 }
 
 #[cfg(test)]
