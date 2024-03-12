@@ -41,4 +41,7 @@ pub trait RawMotorsIO<const N: usize> {
 
     /// Get the Board State byte
     fn get_board_state(&mut self) -> Result<u8>;
+
+    /// Set the Board State byte
+    fn set_board_state(&mut self, state: u8) -> Result<()>;
 }

@@ -244,6 +244,10 @@ pub trait MotorsController<const N: usize> {
     fn get_board_state(&mut self) -> Result<u8> {
         self.io().get_board_state()
     }
+    /// Set the current state of the articulation control board (clear error)
+    fn set_board_state(&mut self, state: u8) -> Result<()> {
+        self.io().set_board_state(state)
+    }
 }
 
 #[derive(Debug)]
