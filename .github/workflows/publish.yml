@@ -22,7 +22,7 @@ jobs:
 
     - uses: actions-rs/toolchain@v1
       with:
-          toolchain: stable
+          toolchain: nightly
           override: true
     - uses: katyo/publish-crates@v1
       with:
