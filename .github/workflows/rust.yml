@@ -12,6 +12,17 @@ jobs:
         steps:
         - uses: actions/checkout@v3
 
+        - name: Setup Rust Toolchain
+          uses: actions-rs/toolchain@v1
+          with:
+            toolchain: nightly
+            override: true
+
+        - name: Toolchain in nightly mode
+          run: |
+            rustup component add rustfmt --toolchain nightly
+            rustup component add clippy --toolchain nightly
+    
         - name: Check
           run: |
             cargo check --all --tests
