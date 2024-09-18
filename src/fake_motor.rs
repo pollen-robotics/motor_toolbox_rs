@@ -110,7 +110,7 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
     }
 
     fn set_torque(&mut self, on: [bool; N]) -> Result<()> {
-        log::info!(target: "fake_io::set_torque", "Setting torque to {:?}", on);
+        log::debug!(target: "fake_io::set_torque", "Setting torque to {:?}", on);
 
         for (cur, target, on, torque_on) in izip!(
             &mut self.current_position,
@@ -146,7 +146,7 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
     }
 
     fn set_target_position(&mut self, target_position: [f64; N]) -> Result<()> {
-        log::info!(target: "fake_io::set_target_position", "Setting target_position to {:?}", target_position);
+        log::debug!(target: "fake_io::set_target_position", "Setting target_position to {:?}", target_position);
         self.target_position = target_position;
 
         for (cur, on, target) in izip!(&mut self.current_position, self.torque_on, target_position)
@@ -163,7 +163,7 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
     }
 
     fn set_target_position_fb(&mut self, target_position: [f64; N]) -> Result<[f64; N]> {
-        log::info!(target: "fake_io::set_target_position", "Setting target_position to {:?}", target_position);
+        log::debug!(target: "fake_io::set_target_position", "Setting target_position to {:?}", target_position);
         self.target_position = target_position;
         let mut fb: [f64; N] = [0.0; { N }];
 
@@ -188,7 +188,7 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
     }
 
     fn set_velocity_limit(&mut self, velocity: [f64; N]) -> Result<()> {
-        log::info!(target: "fake_io::set_velocity_limit", "Setting velocity_limit to {:?}", velocity);
+        log::debug!(target: "fake_io::set_velocity_limit", "Setting velocity_limit to {:?}", velocity);
         self.velocity_limit = velocity;
         Ok(())
     }
@@ -198,7 +198,7 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
     }
 
     fn set_torque_limit(&mut self, torque: [f64; N]) -> Result<()> {
-        log::info!(target: "fake_io::set_torque_limit", "Setting torque_limit to {:?}", torque);
+        log::debug!(target: "fake_io::set_torque_limit", "Setting torque_limit to {:?}", torque);
         self.torque_limit = torque;
         Ok(())
     }
@@ -208,7 +208,7 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
     }
 
     fn set_pid_gains(&mut self, pid: [PID; N]) -> Result<()> {
-        log::info!(target: "fake_io::set_pid_gains", "Setting pid gains to {:?}", pid);
+        log::debug!(target: "fake_io::set_pid_gains", "Setting pid gains to {:?}", pid);
         self.pid = pid;
         Ok(())
     }
