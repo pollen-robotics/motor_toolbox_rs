@@ -10,7 +10,7 @@ pub use limit::Limit;
 mod motors_io;
 pub use motors_io::RawMotorsIO;
 mod motors_controller;
-pub use motors_controller::{MissingResisterErrror, MotorsController};
+pub use motors_controller::{MissingRegisterErrror, MotorsController};
 
 mod pid;
 pub use pid::PID;

@@ -265,11 +265,11 @@ pub trait MotorsController<const N: usize> {
 }
 
 #[derive(Debug)]
-pub struct MissingResisterErrror(pub String);
-impl std::fmt::Display for MissingResisterErrror {
+pub struct MissingRegisterErrror(pub String);
+impl std::fmt::Display for MissingRegisterErrror {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let name = &self.0;
         write!(f, "(missing register \"{name}\")",)
     }
 }
-impl std::error::Error for MissingResisterErrror {}
+impl std::error::Error for MissingRegisterErrror {}
