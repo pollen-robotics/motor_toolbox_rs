@@ -18,6 +18,11 @@ pub trait RawMotorsIO<const N: usize> {
     /// Set the current target position of the motors (in radians)
     fn set_target_position(&mut self, position: [f64; N]) -> Result<()>;
 
+    /// Get the current target torque of the motors (in Nm)
+    fn get_target_torque(&mut self) -> Result<[f64; N]>;
+    /// Set the current target torque of the motors (in Nm)
+    fn set_target_torque(&mut self, torque: [f64; N]) -> Result<()>;
+
     /// Set the current target position and returns the motor feeback (position, velocity, torque)
     fn set_target_position_fb(&mut self, position: [f64; N]) -> Result<[f64; N]>;
 

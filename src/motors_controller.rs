@@ -119,6 +119,20 @@ pub trait MotorsController<const N: usize> {
         self.io().set_target_position(limited_position)
     }
 
+    /// Set the current target torque of the motors (in Nm)
+    fn set_target_torque(&mut self, torque: [f64; N]) -> Result<()> {
+        log::debug!(target: "controller::set_target_torque", "real target_torque: {:?}", torque);
+
+        self.io().set_target_torque(torque)
+    }
+
+    /// Get the current target torque of the motors (in Nm)
+    fn get_target_torque(&mut self) -> Result<[f64; N]> {
+        let torque = self.io().get_target_torque()?;
+        log::debug!(target: "controller::get_target_torque", "raw target_torque: {:?}", torque);
+        Ok(torque)
+    }
+
     /// Set the current target position and returns the motor feeback (position, velocity, torque)
     fn set_target_position_fb(&mut self, position: [f64; N]) -> Result<[f64; N]> {
         log::debug!(target: "controller::set_target_position", "real target_position: {:?}", position);
