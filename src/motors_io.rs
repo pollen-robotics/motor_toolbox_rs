@@ -18,6 +18,9 @@ pub trait RawMotorsIO<const N: usize> {
     /// Set the current target position of the motors (in radians)
     fn set_target_position(&mut self, position: [f64; N]) -> Result<()>;
 
+    /// Set the current target position and returns the motor feeback (position, velocity, torque)
+    fn set_target_position_fb(&mut self, position: [f64; N]) -> Result<[f64; N]>;
+
     /// Get the velocity limit of the motors (in radians per second)
     fn get_velocity_limit(&mut self) -> Result<[f64; N]>;
     /// Set the velocity limit of the motors (in radians per second)
@@ -32,4 +35,13 @@ pub trait RawMotorsIO<const N: usize> {
     fn get_pid_gains(&mut self) -> Result<[PID; N]>;
     /// Set the current PID gains of the motors
     fn set_pid_gains(&mut self, pid: [PID; N]) -> Result<()>;
+
+    /// Get the current axis sensors
+    fn get_axis_sensors(&mut self) -> Result<[f64; N]>;
+
+    /// Get the Board State byte
+    fn get_board_state(&mut self) -> Result<u8>;
+
+    /// Set the Board State byte
+    fn set_board_state(&mut self, state: u8) -> Result<()>;
 }
