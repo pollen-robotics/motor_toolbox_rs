@@ -126,11 +126,39 @@ pub trait MotorsController<const N: usize> {
         self.io().set_target_torque(torque)
     }
 
+    /// Set the current target velocity of the motors (in rad/s)
+    fn set_target_velocity(&mut self, velocity: [f64; N]) -> Result<()> {
+        log::debug!(target: "controller::set_target_velocity", "real target_velocity: {:?}", velocity);
+
+        self.io().set_target_velocity(velocity)
+    }
+
+    /// Set control mode
+    fn set_control_mode(&mut self, mode: [u8; N]) -> Result<()> {
+        log::debug!(target: "controller::set_control_mode", "real control_mode: {:?}", mode);
+
+        self.io().set_control_mode(mode)
+    }
+
     /// Get the current target torque of the motors (in Nm)
     fn get_target_torque(&mut self) -> Result<[f64; N]> {
         let torque = self.io().get_target_torque()?;
         log::debug!(target: "controller::get_target_torque", "raw target_torque: {:?}", torque);
         Ok(torque)
+    }
+
+    /// Get the current target velocity of the motors (in rad/s)
+    fn get_target_velocity(&mut self) -> Result<[f64; N]> {
+        let velocity = self.io().get_target_velocity()?;
+        log::debug!(target: "controller::get_target_velocity", "raw target_velocity: {:?}", velocity);
+        Ok(velocity)
+    }
+
+    /// Get the current control mode
+    fn get_control_mode(&mut self) -> Result<[u8; N]> {
+        let mode = self.io().get_control_mode()?;
+        log::debug!(target: "controller::get_control_mode", "raw control_mode: {:?}", mode);
+        Ok(mode)
     }
 
     /// Set the current target position and returns the motor feeback (position, velocity, torque)
