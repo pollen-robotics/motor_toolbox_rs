@@ -10,6 +10,9 @@ pub trait MotorsController<const N: usize> {
     /// Get the limits of the motors
     fn limits(&self) -> [Option<Limit>; N];
 
+    /// Get the axes invertion
+    fn inverted_axes(&self) -> [Option<bool>; N];
+
     /// Check if the torque is ON or OFF
     fn is_torque_on(&mut self) -> Result<[bool; N]> {
         self.io().is_torque_on()
