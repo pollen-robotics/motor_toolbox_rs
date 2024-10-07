@@ -1,6 +1,7 @@
 use crate::{Result, PID};
 
 pub trait RawMotorsIO<const N: usize> {
+    fn name(&self) -> String;
     /// Check if the motors are ON or OFF
     fn is_torque_on(&mut self) -> Result<[bool; N]>;
     /// Enable/Disable the torque

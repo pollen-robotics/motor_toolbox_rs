@@ -115,6 +115,11 @@ impl<const N: usize> Default for FakeMotorsIO<N> {
 }
 
 impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
+    /// Get the name of the controller
+    fn name(&self) -> String {
+        format!("MotorsController<{:?}>", N)
+    }
+
     fn is_torque_on(&mut self) -> Result<[bool; N]> {
         Ok(self.torque_on)
     }

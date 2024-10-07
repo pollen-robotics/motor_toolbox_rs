@@ -3,6 +3,11 @@ use crate::{Limit, RawMotorsIO, Result, PID};
 pub trait MotorsController<const N: usize> {
     fn io(&mut self) -> &mut dyn RawMotorsIO<N>;
 
+    /// Get the name of the controller
+    fn name(&self) -> String {
+        format!("MotorsController<{:?}>", N)
+    }
+
     /// Get the offsets of the motors (in radians)
     fn offsets(&self) -> [Option<f64>; N];
     /// Get the reduction of the motors
