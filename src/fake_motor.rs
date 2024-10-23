@@ -1,5 +1,3 @@
-use std::f64::{INFINITY, NAN};
-
 use itertools::izip;
 
 use crate::motors_controller::MotorsController;
@@ -76,6 +74,9 @@ pub struct FakeMotorsIO<const N: usize> {
     current_torque: [f64; N],
 
     target_position: [f64; N],
+    target_torque: [f64; N],
+    target_velocity: [f64; N],
+    control_mode: [u8; N],
 
     velocity_limit: [f64; N],
     torque_limit: [f64; N],
@@ -88,17 +89,21 @@ impl<const N: usize> Default for FakeMotorsIO<N> {
             torque_on: [false; N],
 
             current_position: [0.0; N],
-            current_velocity: [NAN; N],
-            current_torque: [NAN; N],
+            current_velocity: [f64::NAN; N],
+            current_torque: [f64::NAN; N],
 
             target_position: [0.0; N],
+            target_torque: [f64::NAN; N],
+            target_velocity: [f64::NAN; N],
 
-            velocity_limit: [INFINITY; N],
-            torque_limit: [INFINITY; N],
+            control_mode: [0; N],
+
+            velocity_limit: [f64::INFINITY; N],
+            torque_limit: [f64::INFINITY; N],
             pid: [PID {
-                p: NAN,
-                i: NAN,
-                d: NAN,
+                p: f64::NAN,
+                i: f64::NAN,
+                d: f64::NAN,
             }; N],
         }
     }
@@ -143,6 +148,60 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
 
     fn get_target_position(&mut self) -> Result<[f64; N]> {
         Ok(self.target_position)
+    }
+
+    fn get_target_torque(&mut self) -> Result<[f64; N]> {
+        Ok(self.target_torque)
+    }
+
+    fn set_target_torque(&mut self, target_torque: [f64; N]) -> Result<()> {
+        log::debug!(target: "fake_io::set_target_torque", "Setting target_torque to {:?}", target_torque);
+        self.target_torque = target_torque;
+
+        for (cur, on, target) in izip!(&mut self.current_torque, self.torque_on, target_torque) {
+            if on {
+                log::debug!(target: "fake_io::set_target_torque", "Setting current torque to target torque {:?} (torque on)", target);
+                *cur = target;
+            } else {
+                log::debug!(target: "fake_io::set_target_torque", "Current torque unchanged (torque off)");
+            }
+        }
+
+        Ok(())
+    }
+
+    fn get_target_velocity(&mut self) -> Result<[f64; N]> {
+        Ok(self.target_velocity)
+    }
+
+    fn set_target_velocity(&mut self, target_velocity: [f64; N]) -> Result<()> {
+        log::debug!(target: "fake_io::set_target_velocity", "Setting target_velocity to {:?}", target_velocity);
+        self.target_velocity = target_velocity;
+
+        for (cur, on, target) in izip!(&mut self.current_velocity, self.torque_on, target_velocity)
+        {
+            if on {
+                log::debug!(target: "fake_io::set_target_velocity", "Setting current velocity to target velocity {:?} (velocity on)", target);
+                *cur = target;
+            } else {
+                log::debug!(target: "fake_io::set_target_velocity", "Current velocity unchanged (velocity off)");
+            }
+        }
+
+        Ok(())
+    }
+
+    fn get_control_mode(&mut self) -> Result<[u8; N]> {
+        Ok(self.control_mode)
+    }
+
+    fn set_control_mode(&mut self, control_mode: [u8; N]) -> Result<()> {
+        log::debug!(target: "fake_io::set_control_mode", "Setting control_mode to {:?}", control_mode);
+        self.control_mode = control_mode;
+
+        log::debug!(target: "fake_io::set_control_mode", "Setting control_mode to {:?}",control_mode);
+
+        Ok(())
     }
 
     fn set_target_position(&mut self, target_position: [f64; N]) -> Result<()> {
