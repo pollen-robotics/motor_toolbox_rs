@@ -282,6 +282,9 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
     fn set_board_state(&mut self, _state: u8) -> Result<()> {
         Ok(())
     }
+    fn get_motors_temperature(&mut self) -> Result<[f64; N]> {
+        Ok([f64::NAN; N])
+    }
 }
 
 #[cfg(test)]

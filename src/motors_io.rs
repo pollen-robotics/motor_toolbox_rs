@@ -61,4 +61,7 @@ pub trait RawMotorsIO<const N: usize> {
 
     /// Set the Board State byte
     fn set_board_state(&mut self, state: u8) -> Result<()>;
+
+    /// Get the current temperature of the motors (in °C)
+    fn get_motors_temperature(&mut self) -> Result<[f64; N]>;
 }

@@ -290,6 +290,11 @@ pub trait MotorsController<const N: usize> {
     fn set_board_state(&mut self, state: u8) -> Result<()> {
         self.io().set_board_state(state)
     }
+
+    /// Get the current temperature of the motors (in °C)
+    fn get_motors_temperature(&mut self) -> Result<[f64; N]> {
+        self.io().get_motors_temperature()
+    }
 }
 
 #[derive(Debug)]
