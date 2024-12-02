@@ -17,7 +17,6 @@ pub trait MotorsController<const N: usize> {
 
     /// Get the axes invertion
     fn inverted_axes(&self) -> [Option<bool>; N] {
-        log::debug!(target: "controller::inverted_axes", "not implemented");
         [None; N]
     }
 
@@ -37,8 +36,14 @@ pub trait MotorsController<const N: usize> {
 
         let reductions = self.reduction();
         let offsets = self.offsets();
+        let inverted_axes = self.inverted_axes();
 
         for i in 0..N {
+            if let Some(inverted) = inverted_axes[i] {
+                if inverted {
+                    position[i] = -position[i];
+                }
+            }
             if let Some(reductions) = reductions[i] {
                 position[i] /= reductions;
             }
@@ -46,6 +51,7 @@ pub trait MotorsController<const N: usize> {
                 position[i] -= offsets;
             }
         }
+
         log::debug!(target: "controller::get_current_position", "after offset/reduction current_position: {:?} (reductions {:?} offsets {:?})", position,reductions,offsets);
 
         Ok(position)
@@ -56,8 +62,14 @@ pub trait MotorsController<const N: usize> {
         log::debug!(target: "controller::get_current_velocity", "raw current_velocity: {:?}", velocity);
 
         let reductions = self.reduction();
+        let inverted_axes = self.inverted_axes();
 
         for i in 0..N {
+            if let Some(inverted) = inverted_axes[i] {
+                if inverted {
+                    velocity[i] = -velocity[i];
+                }
+            }
             if let Some(reductions) = reductions[i] {
                 velocity[i] /= reductions;
             }
@@ -72,8 +84,14 @@ pub trait MotorsController<const N: usize> {
         log::debug!(target: "controller::get_current_torque", "raw current_torque: {:?}", torque);
 
         let reductions = self.reduction();
+        let inverted_axes = self.inverted_axes();
 
         for i in 0..N {
+            if let Some(inverted) = inverted_axes[i] {
+                if inverted {
+                    torque[i] = -torque[i];
+                }
+            }
             if let Some(reductions) = reductions[i] {
                 torque[i] /= reductions;
             }
@@ -89,8 +107,14 @@ pub trait MotorsController<const N: usize> {
 
         let reductions = self.reduction();
         let offsets = self.offsets();
+        let inverted_axes = self.inverted_axes();
 
         for i in 0..N {
+            if let Some(inverted) = inverted_axes[i] {
+                if inverted {
+                    position[i] = -position[i];
+                }
+            }
             if let Some(reductions) = reductions[i] {
                 position[i] /= reductions;
             }
@@ -107,9 +131,10 @@ pub trait MotorsController<const N: usize> {
         log::debug!(target: "controller::set_target_position", "real target_position: {:?}", position);
 
         let mut limited_position = position;
+        let inverted_axes = self.inverted_axes();
         for i in 0..N {
             if let Some(limits) = self.limits()[i] {
-                limited_position[i] = limits.clamp(position[i]);
+                limited_position[i] = limits.clamp(limited_position[i]);
             }
         }
 
@@ -123,6 +148,11 @@ pub trait MotorsController<const N: usize> {
             if let Some(reductions) = reductions[i] {
                 limited_position[i] *= reductions;
             }
+            if let Some(inverted) = inverted_axes[i] {
+                if inverted {
+                    limited_position[i] = -limited_position[i];
+                }
+            }
         }
 
         log::debug!(target: "controller::set_target_position", "raw target_position: {:?}", limited_position);
@@ -130,14 +160,14 @@ pub trait MotorsController<const N: usize> {
         self.io().set_target_position(limited_position)
     }
 
-    /// Set the current target torque of the motors (in Nm)
+    /// Set the current target torque of the motors (in Nm) TODO: inverted_axes?
     fn set_target_torque(&mut self, torque: [f64; N]) -> Result<()> {
         log::debug!(target: "controller::set_target_torque", "real target_torque: {:?}", torque);
 
         self.io().set_target_torque(torque)
     }
 
-    /// Set the current target velocity of the motors (in rad/s)
+    /// Set the current target velocity of the motors (in rad/s) TODO: inverted_axes?
     fn set_target_velocity(&mut self, velocity: [f64; N]) -> Result<()> {
         log::debug!(target: "controller::set_target_velocity", "real target_velocity: {:?}", velocity);
 
@@ -151,14 +181,14 @@ pub trait MotorsController<const N: usize> {
         self.io().set_control_mode(mode)
     }
 
-    /// Get the current target torque of the motors (in Nm)
+    /// Get the current target torque of the motors (in Nm) TODO: inverted_axes?
     fn get_target_torque(&mut self) -> Result<[f64; N]> {
         let torque = self.io().get_target_torque()?;
         log::debug!(target: "controller::get_target_torque", "raw target_torque: {:?}", torque);
         Ok(torque)
     }
 
-    /// Get the current target velocity of the motors (in rad/s)
+    /// Get the current target velocity of the motors (in rad/s) TODO: inverted_axes?
     fn get_target_velocity(&mut self) -> Result<[f64; N]> {
         let velocity = self.io().get_target_velocity()?;
         log::debug!(target: "controller::get_target_velocity", "raw target_velocity: {:?}", velocity);
@@ -177,9 +207,11 @@ pub trait MotorsController<const N: usize> {
         log::debug!(target: "controller::set_target_position", "real target_position: {:?}", position);
 
         let mut limited_position = position;
+        let inverted_axes = self.inverted_axes();
+
         for i in 0..N {
             if let Some(limits) = self.limits()[i] {
-                limited_position[i] = limits.clamp(position[i]);
+                limited_position[i] = limits.clamp(limited_position[i]);
             }
         }
 
@@ -193,6 +225,11 @@ pub trait MotorsController<const N: usize> {
             if let Some(reductions) = reductions[i] {
                 limited_position[i] *= reductions;
             }
+            if let Some(inverted) = inverted_axes[i] {
+                if inverted {
+                    limited_position[i] = -limited_position[i];
+                }
+            }
         }
 
         log::debug!(target: "controller::set_target_position", "raw target_position: {:?}", limited_position);
@@ -202,6 +239,11 @@ pub trait MotorsController<const N: usize> {
         // let ret=[0.0;N*3];
 
         for i in 0..N {
+            if let Some(inverted) = inverted_axes[i] {
+                if inverted {
+                    fb[i] = -fb[i];
+                }
+            }
             if let Some(reductions) = reductions[i] {
                 fb[i] /= reductions; //position
                                      // fb[i + N] /= reductions; //velocity
@@ -288,7 +330,7 @@ pub trait MotorsController<const N: usize> {
         self.io().set_pid_gains(pid)
     }
 
-    /// Get the current axis sensors of the articulation
+    /// Get the current axis sensors of the articulation TODO: inverted_axes?
     fn get_axis_sensors(&mut self) -> Result<[f64; N]> {
         self.io().get_axis_sensors()
     }

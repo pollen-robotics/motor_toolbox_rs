@@ -557,6 +557,25 @@ mod tests {
             motors.set_pid_gains(pids).unwrap();
             assert_eq!(motors.get_pid_gains().unwrap(), pids);
         }
+
+        #[test]
+        fn inverted_axes() {
+            let mut motors = FakeMotorsController::<3>::new()
+                .with_offsets([Some(-1.0), Some(1.0), None])
+                .with_reduction([Some(2.0), None, Some(1.0)])
+                .with_limits([
+                    Some((0.0, 1.0).try_into().unwrap()),
+                    Some((-1.0, 1.0).try_into().unwrap()),
+                    None,
+                ])
+                .with_inverted_axes([None, Some(true), Some(true)]);
+
+            motors.set_target_position([0.0, 1.0, 2.0]).unwrap();
+            assert_eq!(motors.get_target_position().unwrap(), [0.0, 1.0, 2.0]);
+
+            motors.set_target_position([-1.0, 0.0, 1.0]).unwrap();
+            assert_eq!(motors.get_target_position().unwrap(), [0.0, 0.0, 1.0]);
+        }
     }
 
     mod io {
