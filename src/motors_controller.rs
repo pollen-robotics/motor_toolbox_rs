@@ -3,12 +3,23 @@ use crate::{Limit, RawMotorsIO, Result, PID};
 pub trait MotorsController<const N: usize> {
     fn io(&mut self) -> &mut dyn RawMotorsIO<N>;
 
+    /// Get the name of the controller
+    fn name(&self) -> String {
+        format!("MotorsController<{:?}>", N)
+    }
+
     /// Get the offsets of the motors (in radians)
     fn offsets(&self) -> [Option<f64>; N];
     /// Get the reduction of the motors
     fn reduction(&self) -> [Option<f64>; N];
     /// Get the limits of the motors
     fn limits(&self) -> [Option<Limit>; N];
+
+    /// Get the axes invertion
+    fn inverted_axes(&self) -> [Option<bool>; N] {
+        log::debug!(target: "controller::inverted_axes", "not implemented");
+        [None; N]
+    }
 
     /// Check if the torque is ON or OFF
     fn is_torque_on(&mut self) -> Result<[bool; N]> {
@@ -293,11 +304,11 @@ pub trait MotorsController<const N: usize> {
 }
 
 #[derive(Debug)]
-pub struct MissingRegisterErrror(pub String);
-impl std::fmt::Display for MissingRegisterErrror {
+pub struct MissingRegisterError(pub String);
+impl std::fmt::Display for MissingRegisterError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let name = &self.0;
         write!(f, "(missing register \"{name}\")",)
     }
 }
-impl std::error::Error for MissingRegisterErrror {}
+impl std::error::Error for MissingRegisterError {}

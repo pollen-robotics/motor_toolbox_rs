@@ -9,6 +9,7 @@ pub struct FakeMotorsController<const N: usize> {
     offsets: [Option<f64>; N],
     reduction: [Option<f64>; N],
     limits: [Option<Limit>; N],
+    inverted_axes: [Option<bool>; N],
 
     io: FakeMotorsIO<N>,
 }
@@ -32,6 +33,10 @@ impl<const N: usize> FakeMotorsController<N> {
         self.limits = limits;
         self
     }
+    pub fn with_inverted_axes(mut self, inverted: [Option<bool>; N]) -> Self {
+        self.inverted_axes = inverted;
+        self
+    }
 }
 
 impl<const N: usize> Default for FakeMotorsController<N> {
@@ -40,6 +45,7 @@ impl<const N: usize> Default for FakeMotorsController<N> {
             offsets: [None; N],
             reduction: [None; N],
             limits: [None; N],
+            inverted_axes: [None; N],
 
             io: FakeMotorsIO::<N>::default(),
         }
@@ -57,6 +63,10 @@ impl<const N: usize> MotorsController<N> for FakeMotorsController<N> {
 
     fn limits(&self) -> [Option<Limit>; N] {
         self.limits
+    }
+
+    fn inverted_axes(&self) -> [Option<bool>; N] {
+        self.inverted_axes
     }
 
     fn io(&mut self) -> &mut dyn RawMotorsIO<N> {
@@ -110,6 +120,11 @@ impl<const N: usize> Default for FakeMotorsIO<N> {
 }
 
 impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
+    /// Get the name of the controller
+    fn name(&self) -> String {
+        format!("MotorsController<{:?}>", N)
+    }
+
     fn is_torque_on(&mut self) -> Result<[bool; N]> {
         Ok(self.torque_on)
     }
@@ -331,6 +346,15 @@ mod tests {
             assert_eq!(motor.offsets(), [Some(1.0)]);
             assert_eq!(motor.reduction(), [None]);
             assert_eq!(motor.limits(), [Some((0.0, 1.0).try_into().unwrap())]);
+
+            let motor = FakeMotorsController::<1>::new()
+                .with_offsets([Some(1.0)])
+                .with_limits([Some((0.0, 1.0).try_into().unwrap())])
+                .with_inverted_axes([Some(true)]);
+            assert_eq!(motor.offsets(), [Some(1.0)]);
+            assert_eq!(motor.reduction(), [None]);
+            assert_eq!(motor.limits(), [Some((0.0, 1.0).try_into().unwrap())]);
+            assert_eq!(motor.inverted_axes(), [Some(true)]);
         }
 
         #[test]
