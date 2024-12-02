@@ -1,4 +1,3 @@
-use std::f64::{INFINITY, NAN};
 
 use itertools::izip;
 
@@ -98,17 +97,17 @@ impl<const N: usize> Default for FakeMotorsIO<N> {
             torque_on: [false; N],
 
             current_position: [0.0; N],
-            current_velocity: [NAN; N],
-            current_torque: [NAN; N],
+            current_velocity: [f64::NAN; N],
+            current_torque: [f64::NAN; N],
 
             target_position: [0.0; N],
 
-            velocity_limit: [INFINITY; N],
-            torque_limit: [INFINITY; N],
+            velocity_limit: [f64::INFINITY; N],
+            torque_limit: [f64::INFINITY; N],
             pid: [PID {
-                p: NAN,
-                i: NAN,
-                d: NAN,
+                p: f64::NAN,
+                i: f64::NAN,
+                d: f64::NAN,
             }; N],
         }
     }
