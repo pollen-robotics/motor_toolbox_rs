@@ -24,12 +24,12 @@ pub trait RawMotorsIO<const N: usize> {
         Err("get_target_torque not implemented".into())
     }
     /// Set the current target torque of the motors (in Nm)
-    fn set_target_torque(&mut self, torque: [f64; N]) -> Result<()> {
+    fn set_target_torque(&mut self, _torque: [f64; N]) -> Result<()> {
         Err("set_target_torque not implemented".into())
     }
 
     /// Set the current target velocity of the motors (in rad/s)
-    fn set_target_velocity(&mut self, velocity: [f64; N]) -> Result<()> {
+    fn set_target_velocity(&mut self, _velocity: [f64; N]) -> Result<()> {
         Err("set_target_velocity not implemented".into())
     }
 
@@ -39,7 +39,7 @@ pub trait RawMotorsIO<const N: usize> {
     }
 
     /// Set the control mode
-    fn set_control_mode(&mut self, mode: [u8; N]) -> Result<()> {
+    fn set_control_mode(&mut self, _mode: [u8; N]) -> Result<()> {
         Err("set_control_mode not implemented".into())
     }
 
