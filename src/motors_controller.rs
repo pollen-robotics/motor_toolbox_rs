@@ -16,7 +16,10 @@ pub trait MotorsController<const N: usize> {
     fn limits(&self) -> [Option<Limit>; N];
 
     /// Get the axes invertion
-    fn inverted_axes(&self) -> [Option<bool>; N];
+    fn inverted_axes(&self) -> [Option<bool>; N] {
+        log::debug!(target: "controller::inverted_axes", "not implemented");
+        [None; N]
+    }
 
     /// Check if the torque is ON or OFF
     fn is_torque_on(&mut self) -> Result<[bool; N]> {
