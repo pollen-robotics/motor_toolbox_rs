@@ -335,6 +335,16 @@ pub trait MotorsController<const N: usize> {
         self.io().get_axis_sensors()
     }
 
+    /// Get the motors error codes
+    fn get_error_codes(&mut self) -> Result<[i32; N]> {
+        self.io().get_error_codes()
+    }
+
+    /// Get the current zeros of the axis sensors of the articulation TODO: inverted_axes?
+    fn get_axis_sensor_zeros(&mut self) -> Result<[f64; N]> {
+        self.io().get_axis_sensor_zeros()
+    }
+
     /// Get the current state of the articulation control board
     fn get_board_state(&mut self) -> Result<u8> {
         self.io().get_board_state()
@@ -351,6 +361,11 @@ pub trait MotorsController<const N: usize> {
     /// Get the board H-bridges temperatures (in Celsius)
     fn get_board_temperatures(&mut self) -> Result<[f64; N]> {
         self.io().get_board_temperatures()
+    }
+
+    /// Trigger an emergency stop
+    fn emergency_stop(&mut self) {
+        self.io().emergency_stop()
     }
 }
 

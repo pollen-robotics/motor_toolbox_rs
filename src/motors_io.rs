@@ -78,9 +78,23 @@ pub trait RawMotorsIO<const N: usize> {
     /// Get the current axis sensors
     fn get_axis_sensors(&mut self) -> Result<[f64; N]>;
 
+    /// Get the zeros of the axis sensors
+    fn get_axis_sensor_zeros(&mut self) -> Result<[f64; N]> {
+        Err("get_axis_sensor_zeros not implemented".into())
+    }
+
+    /// Get the motors error codes
+    fn get_error_codes(&mut self) -> Result<[i32; N]> {
+        Err("get_error_codes not implemented".into())
+    }
+
     /// Get the Board State byte
     fn get_board_state(&mut self) -> Result<u8>;
 
     /// Set the Board State byte
     fn set_board_state(&mut self, state: u8) -> Result<()>;
+
+    fn emergency_stop(&mut self) {
+        log::error!("EMERGENCY STOP NOT IMPLEMENTED!");
+    }
 }
