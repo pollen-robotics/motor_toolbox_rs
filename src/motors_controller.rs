@@ -350,7 +350,7 @@ pub trait MotorsController<const N: usize> {
     }
     /// Get the board H-bridges temperatures (in Celsius)
     fn get_board_temperatures(&mut self) -> Result<[f64; N]> {
-        self.io().get_motor_temperatures()
+        self.io().get_board_temperatures()
     }
 }
 
