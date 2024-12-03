@@ -132,11 +132,11 @@ pub trait MotorsController<const N: usize> {
 
         let mut limited_position = position;
         let inverted_axes = self.inverted_axes();
-        for i in 0..N {
+        (0..N).for_each(|i| {
             if let Some(limits) = self.limits()[i] {
                 limited_position[i] = limits.clamp(limited_position[i]);
             }
-        }
+        });
 
         let reductions = self.reduction();
         let offsets = self.offsets();
@@ -209,11 +209,11 @@ pub trait MotorsController<const N: usize> {
         let mut limited_position = position;
         let inverted_axes = self.inverted_axes();
 
-        for i in 0..N {
+        (0..N).for_each(|i| {
             if let Some(limits) = self.limits()[i] {
                 limited_position[i] = limits.clamp(limited_position[i]);
             }
-        }
+        });
 
         let reductions = self.reduction();
         let offsets = self.offsets();
