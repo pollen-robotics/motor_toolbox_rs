@@ -48,6 +48,15 @@ pub trait RawMotorsIO<const N: usize> {
         Err("get_control_mode not implemented".into())
     }
 
+    /// Get the motor temperatures (in Celsius)
+    fn get_motor_temperatures(&mut self) -> Result<[f64; N]> {
+        Err("get_motor_temperatures not implemented".into())
+    }
+    /// Get the board H-bridges temperatures (in Celsius)
+    fn get_board_temperatures(&mut self) -> Result<[f64; N]> {
+        Err("get_board_temperatures not implemented".into())
+    }
+
     /// Set the current target position and returns the motor feeback (position, velocity, torque)
     fn set_target_position_fb(&mut self, position: [f64; N]) -> Result<[f64; N]>;
 
