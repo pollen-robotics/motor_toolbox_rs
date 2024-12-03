@@ -291,11 +291,27 @@ impl<const N: usize> RawMotorsIO<N> for FakeMotorsIO<N> {
         Ok(self.current_position)
     }
 
+    fn get_axis_sensor_zeros(&mut self) -> Result<[f64; N]> {
+        Ok([0.0; N])
+    }
+
     fn get_board_state(&mut self) -> Result<u8> {
         Ok(0)
     }
     fn set_board_state(&mut self, _state: u8) -> Result<()> {
         Ok(())
+    }
+
+    fn get_motor_temperatures(&mut self) -> Result<[f64; N]> {
+        Ok([f64::NAN; N])
+    }
+
+    fn get_board_temperatures(&mut self) -> Result<[f64; N]> {
+        Ok([f64::NAN; N])
+    }
+
+    fn emergency_stop(&mut self) {
+        self.torque_on = [false; N];
     }
 }
 
