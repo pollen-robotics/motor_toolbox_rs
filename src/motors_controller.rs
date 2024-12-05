@@ -8,6 +8,10 @@ pub trait MotorsController<const N: usize> {
         format!("MotorsController<{:?}>", N)
     }
 
+    /// Get the axes inversion of the output
+    fn output_inverted_axes(&self) -> [Option<bool>; N] {
+        [None; N]
+    }
     /// Get the offsets of the motors (in radians)
     fn offsets(&self) -> [Option<f64>; N];
     /// Get the reduction of the motors
