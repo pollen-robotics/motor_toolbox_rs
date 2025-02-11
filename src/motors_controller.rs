@@ -97,7 +97,8 @@ pub trait MotorsController<const N: usize> {
                 }
             }
             if let Some(reductions) = reductions[i] {
-                torque[i] /= reductions;
+                // torque output is reductions times higher than the input
+                torque[i] *= reductions;
             }
         }
         log::debug!(target: "controller::get_current_torque", "after reduction current_torque: {:?}", torque);
