@@ -12,6 +12,12 @@ pub trait MotorsController<const N: usize> {
     fn output_inverted_axes(&self) -> [Option<bool>; N] {
         [None; N]
     }
+
+    /// The conversion ratio from current to torque
+    fn torque_current_ratio(&self) -> Option<f64> {
+        None
+    }
+
     /// Get the offsets of the motors (in radians)
     fn offsets(&self) -> [Option<f64>; N];
     /// Get the reduction of the motors
