@@ -18,6 +18,16 @@ pub trait MotorsController<const N: usize> {
         None
     }
 
+    /// The nominal current (should be the max current allowed in the Firmware) in A
+    fn nominal_current(&self) -> Option<f64> {
+        None
+    }
+
+    /// The nominal velocity (should be the max velocity allowed in the Firmware) in rad/s
+    fn nominal_velocity(&self) -> Option<f64> {
+        None
+    }
+
     /// Get the offsets of the motors (in radians)
     fn offsets(&self) -> [Option<f64>; N];
     /// Get the reduction of the motors
