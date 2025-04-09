@@ -18,13 +18,13 @@ pub trait MotorsController<const N: usize> {
         None
     }
 
-    /// The nominal current (should be the max current allowed in the Firmware) in A
-    fn nominal_current(&self) -> Option<f64> {
+    /// The max current (should be the max current allowed in the Firmware) in A
+    fn max_current(&self) -> Option<f64> {
         None
     }
 
-    /// The nominal velocity (should be the max velocity allowed in the Firmware) in rad/s
-    fn nominal_velocity(&self) -> Option<f64> {
+    /// The max velocity (should be the max velocity allowed in the Firmware) in rad/s
+    fn max_velocity(&self) -> Option<f64> {
         None
     }
 
